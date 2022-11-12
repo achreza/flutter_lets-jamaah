@@ -1,0 +1,26 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "lets_jamaah",
+      "request": "launch",
+      "type": "dart",
+      "ACCESS_TOKEN": "pk.eyJ1IjoiZmFocmV6YTk1MCIsImEiOiJjbGFkanhyMGwwbDFmM3JwZWMyN3doMWJ6In0.ujZItraK1ghzXGetSCBmUg"
+    },
+    {
+      "name": "lets_jamaah (profile mode)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile"
+    },
+    {
+      "name": "lets_jamaah (release mode)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release"
+    }
+  ]
+}

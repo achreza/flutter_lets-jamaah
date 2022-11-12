@@ -1,0 +1,37 @@
+name: lets_jamaah
+version: 1.0.0+1
+publish_to: none
+description: A new Flutter project.
+environment:
+  sdk: ">=2.18.2 <3.0.0"
+
+dependencies:
+  cupertino_icons: ^1.0.2
+  get: 4.6.5
+  flutter:
+    sdk: flutter
+  flutter_map: ^3.0.0
+  google_fonts: ^3.0.1
+  mapbox_gl: ^0.16.0
+  location: ^4.0.0
+  path_provider: ^2.0.0
+  http: ^0.13.0
+  collection: ^1.0.0
+  device_info_plus: ^3.2.2
+
+dev_dependencies:
+  flutter_lints: ^2.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/fill/cat_silhouette_pattern.png
+    - assets/fill-extrusion/indoor_3d_map.json
+    - assets/symbols/custom-icon.png
+    - assets/symbols/2.0x/custom-icon.png
+    - assets/symbols/3.0x/custom-icon.png
+    - assets/style.json
+    - assets/sydney.png
