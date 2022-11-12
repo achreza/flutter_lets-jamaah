@@ -6,7 +6,11 @@ import 'package:google_fonts/google_fonts.dart';
 import '../controllers/dzikir_counter_controller.dart';
 
 class DzikirCounterView extends GetView<DzikirCounterController> {
-  const DzikirCounterView({Key? key}) : super(key: key);
+  DzikirCounterView({Key? key}) : super(key: key);
+
+  var controller = Get.put<DzikirCounterController>(
+    DzikirCounterController(),
+  );
 
   @override
   Widget build(BuildContext context) {

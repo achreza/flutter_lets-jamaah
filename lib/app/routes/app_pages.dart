@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
-
 import 'package:lets_jamaah/app/modules/home/bindings/home_binding.dart';
+import 'package:lets_jamaah/app/modules/home/views/home_nav_view.dart';
 import 'package:lets_jamaah/app/modules/home/views/home_view.dart';
 import 'package:lets_jamaah/app/modules/maps/bindings/maps_binding.dart';
 import 'package:lets_jamaah/app/modules/maps/views/maps_view.dart';
@@ -15,19 +15,17 @@ import '../modules/home/views/home_view.dart';
 import '../modules/maps/bindings/maps_binding.dart';
 import '../modules/maps/views/maps_view.dart';
 
-
 part 'app_routes.dart';
 
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.NEAREST_MOSQUE;
-
+  static const INITIAL = Routes.HOME;
 
   static final routes = [
     GetPage(
       name: _Paths.HOME,
-      page: () => HomeView(),
+      page: () => HomeNavView(),
       binding: HomeBinding(),
     ),
     GetPage(
@@ -36,17 +34,14 @@ class AppPages {
       binding: MapsBinding(),
     ),
     GetPage(
-
       name: _Paths.NEAREST_MOSQUE,
       page: () => NearestMosqueView(),
       binding: NearestMosqueBinding(),
-      ),
-      
-      GetPage(
+    ),
+    GetPage(
       name: _Paths.DZIKIR_COUNTER,
-      page: () => const DzikirCounterView(),
+      page: () => DzikirCounterView(),
       binding: DzikirCounterBinding(),
-
     ),
   ];
 }
