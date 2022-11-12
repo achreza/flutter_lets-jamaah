@@ -4,6 +4,7 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 
 import 'maps_view.dart';
 import 'page.dart';
+import 'package:lets_jamaah/app/constants/constant.dart';
 
 class AnnotationOrderPage extends ExamplePage {
   AnnotationOrderPage()
@@ -24,7 +25,7 @@ class _AnnotationOrderBodyState extends State<AnnotationOrderBody> {
   late MapboxMapController controllerOne;
   late MapboxMapController controllerTwo;
 
-  final LatLng center = const LatLng(36.580664, 32.5563837);
+  final LatLng center = uinMalang!;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +51,7 @@ class _AnnotationOrderBodyState extends State<AnnotationOrderBody> {
                       onStyleLoadedCallback: () => onStyleLoaded(controllerOne),
                       initialCameraPosition: CameraPosition(
                         target: center,
-                        zoom: 5.0,
+                        zoom: 14.0,
                       ),
                       annotationOrder: const [
                         AnnotationType.line,

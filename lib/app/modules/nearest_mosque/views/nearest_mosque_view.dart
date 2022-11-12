@@ -3,17 +3,17 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lets_jamaah/app/constants/constant.dart';
 import 'package:lets_jamaah/app/data/mosque_model.dart';
+import 'package:lets_jamaah/app/modules/nearest_mosque/controllers/nearest_mosque_controller.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 
-import 'maps_view.dart';
-import 'page.dart';
+import '../../maps/views/maps_view.dart';
+import '../../maps/views/page.dart';
 
-class PlaceSourcePage extends ExamplePage {
-  PlaceSourcePage() : super(const Icon(Icons.place), 'Place source');
-
+class NearestMosqueView extends GetView<NearestMosqueController> {
   @override
   Widget build(BuildContext context) {
     return const PlaceSymbolBody();
@@ -30,6 +30,9 @@ class PlaceSymbolBody extends StatefulWidget {
 class PlaceSymbolBodyState extends State<PlaceSymbolBody> {
   PlaceSymbolBodyState();
 
+  static const SOURCE_PERSON = 'person_source';
+  static const LAYER_PERSON = 'person_layer';
+
   static const SOURCE_ID = 'masjid1_source';
   static const LAYER_ID = 'masjid1_layer';
 
@@ -45,6 +48,13 @@ class PlaceSymbolBodyState extends State<PlaceSymbolBody> {
 
   void _onMapCreated(MapboxMapController controller) {
     this.controller = controller;
+//lokasi terkini
+    addLocationSourceFromAsset(SOURCE_PERSON, 'assets/person.png',
+            -7.95077701450639, 112.60818156532146)
+        .then((value) {
+      setState(() => sourceAdded = true);
+    });
+    addLayer(LAYER_PERSON, SOURCE_PERSON);
 
     addImageSourceFromAsset(SOURCE_ID, 'assets/dome.png', listMasjid[0])
         .then((value) {
@@ -87,6 +97,14 @@ class PlaceSymbolBodyState extends State<PlaceSymbolBody> {
     final Uint8List list = bytes.buffer.asUint8List();
     return controller.addImageSource(
         imageSourceId, list, convertToKotak(data.latitude, data.longitude));
+  }
+
+  Future<void> addLocationSourceFromAsset(String imageSourceId,
+      String assetName, double latitude, double longitude) async {
+    final ByteData bytes = await rootBundle.load(assetName);
+    final Uint8List list = bytes.buffer.asUint8List();
+    return controller.addImageSource(
+        imageSourceId, list, convertToKotak(latitude, longitude));
   }
 
   /// Update an asset image as a source to the currently displayed style
@@ -135,68 +153,66 @@ class PlaceSymbolBodyState extends State<PlaceSymbolBody> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: Stack(
-          children: <Widget>[
-            SizedBox(
-              height: 450,
-              child: MapboxMap(
-                dragEnabled: true,
-                zoomGesturesEnabled: true,
-                myLocationEnabled: true,
-                accessToken: MapsDemo.ACCESS_TOKEN,
-                onMapCreated: _onMapCreated,
-                initialCameraPosition: const CameraPosition(
-                  target: LatLng(-7.951346, 112.607515),
-                  zoom: 15.5,
-                ),
+    return Scaffold(
+      body: Stack(
+        children: <Widget>[
+          SizedBox(
+            height: 450,
+            child: MapboxMap(
+              dragEnabled: true,
+              zoomGesturesEnabled: true,
+              myLocationEnabled: true,
+              accessToken: MapsDemo.ACCESS_TOKEN,
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: const CameraPosition(
+                target: LatLng(-7.951346, 112.607515),
+                zoom: 15.5,
               ),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                padding: EdgeInsets.only(left: 20, top: 20, bottom: 20),
-                height: 350,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(24),
-                        topRight: Radius.circular(24))),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Nearest Mosque",
-                      style: GoogleFonts.lato(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    ListView.builder(
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) => ListTile(
-                            leading: Icon(Icons.mosque),
-                            title: Text(
-                              listMasjid[index].nama,
-                              style: titleStyle,
-                            ),
-                            subtitle: Text(
-                              listMasjid[index].alamat,
-                              style: subtitleStyle,
-                            ),
-                            trailing: IconButton(
-                              icon: Icon(Icons.directions),
-                              onPressed: () {},
-                            )),
-                        itemCount: 3)
-                  ],
-                ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              padding: EdgeInsets.only(left: 20, top: 20, bottom: 20),
+              height: 350,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(24),
+                      topRight: Radius.circular(24))),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    "Nearest Mosque",
+                    style: GoogleFonts.lato(
+                        fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) => ListTile(
+                          leading: Icon(Icons.mosque),
+                          title: Text(
+                            listMasjid[index].nama,
+                            style: titleStyle,
+                          ),
+                          subtitle: Text(
+                            listMasjid[index].alamat,
+                            style: subtitleStyle,
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(Icons.directions),
+                            onPressed: () {},
+                          )),
+                      itemCount: 3)
+                ],
               ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       ),
     );
   }

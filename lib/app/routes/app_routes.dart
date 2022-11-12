@@ -6,11 +6,16 @@ abstract class Routes {
 
   static const HOME = _Paths.HOME;
   static const MAPS = _Paths.MAPS;
-  static const DZIKIR_COUNTER = _Paths.DZIKIR_COUNTER;
+  static const NEAREST_MOSQUE = _Paths.NEAREST_MOSQUE;
+
 }
 
 abstract class _Paths {
   static const HOME = '/home';
   static const MAPS = '/maps';
+
+  static const NEAREST_MOSQUE = '/nearest-mosque';
+
   static const DZIKIR_COUNTER = '/dzikir-counter';
+
 }
