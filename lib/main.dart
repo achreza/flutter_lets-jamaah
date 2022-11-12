@@ -6,11 +6,9 @@ import 'app/routes/app_pages.dart';
 
 void main() {
   runApp(
-    GetMaterialA
+    GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: "Lets Jamaah
-      title: "Application",
-
+      title: "Lets Jamaah",
       initialRoute: AppPages.INITIAL,
       getPages: AppPages.routes,
     ),
