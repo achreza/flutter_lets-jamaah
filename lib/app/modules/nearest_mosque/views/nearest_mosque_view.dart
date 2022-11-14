@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lets_jamaah/app/constants/constant.dart';
@@ -14,22 +15,6 @@ import '../../maps/views/maps_view.dart';
 import '../../maps/views/page.dart';
 
 class NearestMosqueView extends GetView<NearestMosqueController> {
-  @override
-  Widget build(BuildContext context) {
-    return const PlaceSymbolBody();
-  }
-}
-
-class PlaceSymbolBody extends StatefulWidget {
-  const PlaceSymbolBody();
-
-  @override
-  State<StatefulWidget> createState() => PlaceSymbolBodyState();
-}
-
-class PlaceSymbolBodyState extends State<PlaceSymbolBody> {
-  PlaceSymbolBodyState();
-
   static const SOURCE_PERSON = 'person_source';
   static const LAYER_PERSON = 'person_layer';
 
@@ -42,42 +27,37 @@ class PlaceSymbolBodyState extends State<PlaceSymbolBody> {
   static const SOURCE_ID3 = 'masjid3_source';
   static const LAYER_ID3 = 'masjid3_layer';
 
-  bool sourceAdded = false;
-  bool layerAdded = false;
-  late MapboxMapController controller;
+  RxBool sourceAdded = false.obs;
+  RxBool layerAdded = false.obs;
+  late MapboxMapController mapController;
 
-  void _onMapCreated(MapboxMapController controller) {
-    this.controller = controller;
-//lokasi terkini
-    addLocationSourceFromAsset(SOURCE_PERSON, 'assets/person.png',
-            -7.95077701450639, 112.60818156532146)
-        .then((value) {
-      setState(() => sourceAdded = true);
-    });
-    addLayer(LAYER_PERSON, SOURCE_PERSON);
+  void _onMapCreated(MapboxMapController mapController) async {
+    this.mapController = mapController;
+
+    // addLocationSourceFromAsset(SOURCE_PERSON, 'assets/person.png',
+    //         controller.position!.latitude, controller.position!.longitude)
+    //     .then((value) {
+    //   sourceAdded.value = true;
+    // });
+    // addLayer(LAYER_PERSON, SOURCE_PERSON);
 
     addImageSourceFromAsset(SOURCE_ID, 'assets/dome.png', listMasjid[0])
         .then((value) {
-      setState(() => sourceAdded = true);
+      sourceAdded.value = true;
     });
     addLayer(LAYER_ID, SOURCE_ID);
 
     addImageSourceFromAsset(SOURCE_ID2, 'assets/dome.png', listMasjid[1])
         .then((value) {
-      setState(() => sourceAdded = true);
+      sourceAdded.value = true;
     });
     addLayer(LAYER_ID2, SOURCE_ID2);
 
     addImageSourceFromAsset(SOURCE_ID3, 'assets/dome.png', listMasjid[2])
         .then((value) {
-      setState(() => sourceAdded = true);
+      sourceAdded.value = true;
     });
     addLayer(LAYER_ID3, SOURCE_ID3);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   LatLngQuad convertToKotak(double latitude, double longitude) {
@@ -95,7 +75,7 @@ class PlaceSymbolBodyState extends State<PlaceSymbolBody> {
       String imageSourceId, String assetName, MosqueModel data) async {
     final ByteData bytes = await rootBundle.load(assetName);
     final Uint8List list = bytes.buffer.asUint8List();
-    return controller.addImageSource(
+    return mapController.addImageSource(
         imageSourceId, list, convertToKotak(data.latitude, data.longitude));
   }
 
@@ -103,7 +83,7 @@ class PlaceSymbolBodyState extends State<PlaceSymbolBody> {
       String assetName, double latitude, double longitude) async {
     final ByteData bytes = await rootBundle.load(assetName);
     final Uint8List list = bytes.buffer.asUint8List();
-    return controller.addImageSource(
+    return mapController.addImageSource(
         imageSourceId, list, convertToKotak(latitude, longitude));
   }
 
@@ -112,7 +92,7 @@ class PlaceSymbolBodyState extends State<PlaceSymbolBody> {
       String imageSourceId, String assetName) async {
     final ByteData bytes = await rootBundle.load(assetName);
     final Uint8List list = bytes.buffer.asUint8List();
-    return controller.addImageSource(
+    return mapController.addImageSource(
       imageSourceId,
       list,
       const LatLngQuad(
@@ -125,51 +105,54 @@ class PlaceSymbolBodyState extends State<PlaceSymbolBody> {
   }
 
   Future<void> removeImageSource(String imageSourceId) {
-    return controller.removeSource(imageSourceId);
+    return mapController.removeSource(imageSourceId);
   }
 
   Future<void> addLayer(String imageLayerId, String imageSourceId) {
-    if (layerAdded) {
+    if (layerAdded.value) {
       removeLayer(imageLayerId);
     }
-    setState(() => layerAdded = true);
-    return controller.addImageLayer(imageLayerId, imageSourceId);
+    layerAdded.value = true;
+    return mapController.addImageLayer(imageLayerId, imageSourceId);
   }
 
   Future<void> addLayerBelow(
       String imageLayerId, String imageSourceId, String belowLayerId) {
-    if (layerAdded) {
+    if (layerAdded.value) {
       removeLayer(imageLayerId);
     }
-    setState(() => layerAdded = true);
-    return controller.addImageLayerBelow(
+    layerAdded.value = true;
+    return mapController.addImageLayerBelow(
         imageLayerId, imageSourceId, belowLayerId);
   }
 
   Future<void> removeLayer(String imageLayerId) {
-    setState(() => layerAdded = false);
-    return controller.removeLayer(imageLayerId);
+    layerAdded.value = false;
+    return mapController.removeLayer(imageLayerId);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
+        body: Obx(
+      () => Stack(
         children: <Widget>[
-          SizedBox(
-            height: 450,
-            child: MapboxMap(
-              dragEnabled: true,
-              zoomGesturesEnabled: true,
-              myLocationEnabled: true,
-              accessToken: MapsDemo.ACCESS_TOKEN,
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: const CameraPosition(
-                target: LatLng(-7.951346, 112.607515),
-                zoom: 15.5,
-              ),
-            ),
-          ),
+          controller.isLoading.value
+              ? Center(child: CircularProgressIndicator())
+              : SizedBox(
+                  height: 450,
+                  child: MapboxMap(
+                    dragEnabled: true,
+                    zoomGesturesEnabled: true,
+                    myLocationEnabled: true,
+                    accessToken: MapsDemo.ACCESS_TOKEN,
+                    onMapCreated: _onMapCreated,
+                    initialCameraPosition: const CameraPosition(
+                      target: LatLng(-7.951346, 112.607515),
+                      zoom: 15.5,
+                    ),
+                  ),
+                ),
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -214,6 +197,6 @@ class PlaceSymbolBodyState extends State<PlaceSymbolBody> {
           )
         ],
       ),
-    );
+    ));
   }
 }
