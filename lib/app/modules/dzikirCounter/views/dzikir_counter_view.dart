@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lets_jamaah/app/constants/constant.dart';
 
 import '../controllers/dzikir_counter_controller.dart';
 
@@ -41,7 +42,7 @@ class DzikirCounterView extends GetView<DzikirCounterController> {
                 padding: EdgeInsets.all(8),
                 //rounded corner
                 decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 246, 238, 252),
+                  color: primaryColor.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -62,16 +63,16 @@ class DzikirCounterView extends GetView<DzikirCounterController> {
                       child: Container(
                         margin: EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 241, 224, 252),
+                          color: primaryColor.withOpacity(0.6),
                           shape: BoxShape.circle,
                         ),
                         child: Center(
                           child: Obx(() => Text(
                                 controller.count.value.toString(),
                                 style: GoogleFonts.lato(
-                                  fontSize: 64,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                    fontSize: 64,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
                               )),
                         ),
                       ),

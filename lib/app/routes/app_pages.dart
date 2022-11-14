@@ -6,6 +6,7 @@ import 'package:lets_jamaah/app/modules/home/views/home_view.dart';
 import 'package:lets_jamaah/app/modules/maps/bindings/maps_binding.dart';
 import 'package:lets_jamaah/app/modules/maps/views/maps_view.dart';
 import 'package:lets_jamaah/app/modules/maps/views/place_source.dart';
+import 'package:lets_jamaah/app/modules/maps/views/show_directions.dart';
 import 'package:lets_jamaah/app/modules/nearest_mosque/bindings/nearest_mosque_binding.dart';
 import 'package:lets_jamaah/app/modules/nearest_mosque/views/nearest_mosque_view.dart';
 import '../modules/dzikirCounter/bindings/dzikir_counter_binding.dart';
@@ -30,7 +31,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.MAPS,
-      page: () => PlaceSourcePage(),
+      page: () => ShowDirections(),
       binding: MapsBinding(),
     ),
     GetPage(
