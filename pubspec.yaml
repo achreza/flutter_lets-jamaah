@@ -19,6 +19,7 @@ dependencies:
   collection: ^1.0.0
   device_info_plus: ^3.2.2
   intl: ^0.17.0 
+  hexcolor: ^3.0.1
 
 dev_dependencies:
   flutter_lints: ^2.0.0
@@ -34,5 +35,10 @@ flutter:
     - assets/symbols/custom-icon.png
     - assets/symbols/2.0x/custom-icon.png
     - assets/symbols/3.0x/custom-icon.png
+    - assets/symbols/imsak.png
+    - assets/symbols/logo.png
+    - assets/symbols/terbit.png
     - assets/style.json
     - assets/sydney.png
+    - assets/masjid.png
+    - assets/bg.png
