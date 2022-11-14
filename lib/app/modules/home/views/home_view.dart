@@ -7,6 +7,7 @@ import '../controllers/home_controller.dart';
 class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
+
     Widget listPray(String pray, String data) {
       return Card(
         margin: const EdgeInsets.fromLTRB(25, 2, 25, 2),
@@ -27,8 +28,6 @@ class HomeView extends GetView<HomeController> {
                       textStyle: TextStyle(color: HexColor("#684D92")),
                       fontWeight: FontWeight.w700,
                       fontSize: 20))),
-        ),
-      );
     }
 
     return Scaffold(

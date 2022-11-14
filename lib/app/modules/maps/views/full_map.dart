@@ -5,7 +5,7 @@ import 'maps_view.dart';
 import 'page.dart';
 
 class FullMapPage extends ExamplePage {
-  FullMapPage() : super(const Icon(Icons.map), 'Full screen map');
+  FullMapPage() : super(const Icon(Icons.map), 'Masjid  Terdekat');
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +52,10 @@ class FullMapState extends State<FullMap> {
           styleString: isLight ? MapboxStyles.LIGHT : MapboxStyles.DARK,
           accessToken: MapsDemo.ACCESS_TOKEN,
           onMapCreated: _onMapCreated,
-          initialCameraPosition: const CameraPosition(target: LatLng(0.0, 0.0)),
+          zoomGesturesEnabled: true,
+          doubleClickZoomEnabled: true,
+          initialCameraPosition:
+              const CameraPosition(target: LatLng(-7.951346, 112.607515)),
           onStyleLoadedCallback: _onStyleLoadedCallback,
         ));
   }

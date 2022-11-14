@@ -1,12 +1,11 @@
-// Copyright 2018 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:lets_jamaah/app/constants/constant.dart';
+import 'package:lets_jamaah/app/data/mosque_model.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 
 import 'maps_view.dart';
@@ -31,8 +30,14 @@ class PlaceSymbolBody extends StatefulWidget {
 class PlaceSymbolBodyState extends State<PlaceSymbolBody> {
   PlaceSymbolBodyState();
 
-  static const SOURCE_ID = 'sydney_source';
-  static const LAYER_ID = 'sydney_layer';
+  static const SOURCE_ID = 'masjid1_source';
+  static const LAYER_ID = 'masjid1_layer';
+
+  static const SOURCE_ID2 = 'masjid2_source';
+  static const LAYER_ID2 = 'masjid2_layer';
+
+  static const SOURCE_ID3 = 'masjid3_source';
+  static const LAYER_ID3 = 'masjid3_layer';
 
   bool sourceAdded = false;
   bool layerAdded = false;
@@ -40,6 +45,24 @@ class PlaceSymbolBodyState extends State<PlaceSymbolBody> {
 
   void _onMapCreated(MapboxMapController controller) {
     this.controller = controller;
+
+    addImageSourceFromAsset(SOURCE_ID, 'assets/dome.png', listMasjid[0])
+        .then((value) {
+      setState(() => sourceAdded = true);
+    });
+    addLayer(LAYER_ID, SOURCE_ID);
+
+    addImageSourceFromAsset(SOURCE_ID2, 'assets/dome.png', listMasjid[1])
+        .then((value) {
+      setState(() => sourceAdded = true);
+    });
+    addLayer(LAYER_ID2, SOURCE_ID2);
+
+    addImageSourceFromAsset(SOURCE_ID3, 'assets/dome.png', listMasjid[2])
+        .then((value) {
+      setState(() => sourceAdded = true);
+    });
+    addLayer(LAYER_ID3, SOURCE_ID3);
   }
 
   @override
@@ -47,21 +70,23 @@ class PlaceSymbolBodyState extends State<PlaceSymbolBody> {
     super.dispose();
   }
 
+  LatLngQuad convertToKotak(double latitude, double longitude) {
+    final LatLngQuad kotak = LatLngQuad(
+        topLeft: LatLng(latitude + 0.0003, longitude - 0.0003),
+        topRight: LatLng(latitude + 0.0003, longitude + 0.0003),
+        bottomRight: LatLng(latitude - 0.0003, longitude + 0.0003),
+        bottomLeft: LatLng(latitude - 0.0003, longitude - 0.0003));
+    print("INI VALUE NYA : " + kotak.toString());
+    return kotak;
+  }
+
   /// Adds an asset image as a source to the currently displayed style
   Future<void> addImageSourceFromAsset(
-      String imageSourceId, String assetName) async {
+      String imageSourceId, String assetName, MosqueModel data) async {
     final ByteData bytes = await rootBundle.load(assetName);
     final Uint8List list = bytes.buffer.asUint8List();
     return controller.addImageSource(
-      imageSourceId,
-      list,
-      const LatLngQuad(
-        bottomRight: LatLng(-33.86264728692581, 151.19916915893555),
-        bottomLeft: LatLng(-33.86264728692581, 151.2288236618042),
-        topLeft: LatLng(-33.84322353475214, 151.2288236618042),
-        topRight: LatLng(-33.84322353475214, 151.19916915893555),
-      ),
-    );
+        imageSourceId, list, convertToKotak(data.latitude, data.longitude));
   }
 
   /// Update an asset image as a source to the currently displayed style
@@ -110,87 +135,69 @@ class PlaceSymbolBodyState extends State<PlaceSymbolBody> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        SizedBox(
-          height: 300.0,
-          child: MapboxMap(
-            accessToken: MapsDemo.ACCESS_TOKEN,
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: const CameraPosition(
-              target: LatLng(-33.852, 151.211),
-              zoom: 10.0,
+    return MaterialApp(
+      home: Scaffold(
+        body: Stack(
+          children: <Widget>[
+            SizedBox(
+              height: 450,
+              child: MapboxMap(
+                dragEnabled: true,
+                zoomGesturesEnabled: true,
+                myLocationEnabled: true,
+                accessToken: MapsDemo.ACCESS_TOKEN,
+                onMapCreated: _onMapCreated,
+                initialCameraPosition: const CameraPosition(
+                  target: LatLng(-7.951346, 112.607515),
+                  zoom: 15.5,
+                ),
+              ),
             ),
-          ),
-        ),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    TextButton(
-                      child: const Text('Add source (asset image)'),
-                      onPressed: sourceAdded
-                          ? null
-                          : () {
-                              addImageSourceFromAsset(
-                                      SOURCE_ID, 'assets/sydney.png')
-                                  .then((value) {
-                                setState(() => sourceAdded = true);
-                              });
-                            },
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                padding: EdgeInsets.only(left: 20, top: 20, bottom: 20),
+                height: 350,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(24),
+                        topRight: Radius.circular(24))),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Nearest Mosque",
+                      style: GoogleFonts.lato(
+                          fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                    TextButton(
-                      child: const Text('Update source (asset image)'),
-                      onPressed: !sourceAdded
-                          ? null
-                          : () {
-                              updateImageSourceFromAsset(SOURCE_ID,
-                                      'assets/symbols/custom-icon.png')
-                                  .then((value) {
-                                setState(() => sourceAdded = true);
-                              });
-                            },
-                    ),
-                    TextButton(
-                      child: const Text('Remove source (asset image)'),
-                      onPressed: sourceAdded
-                          ? () async {
-                              await removeLayer(LAYER_ID);
-                              removeImageSource(SOURCE_ID).then((value) {
-                                setState(() => sourceAdded = false);
-                              });
-                            }
-                          : null,
-                    ),
-                    TextButton(
-                      child: const Text('Show layer'),
-                      onPressed: sourceAdded
-                          ? () => addLayer(LAYER_ID, SOURCE_ID)
-                          : null,
-                    ),
-                    TextButton(
-                      child: const Text('Show layer below water'),
-                      onPressed: sourceAdded
-                          ? () => addLayerBelow(LAYER_ID, SOURCE_ID, 'water')
-                          : null,
-                    ),
-                    TextButton(
-                      child: const Text('Hide layer'),
-                      onPressed:
-                          sourceAdded ? () => removeLayer(LAYER_ID) : null,
-                    ),
+                    ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) => ListTile(
+                            leading: Icon(Icons.mosque),
+                            title: Text(
+                              listMasjid[index].nama,
+                              style: titleStyle,
+                            ),
+                            subtitle: Text(
+                              listMasjid[index].alamat,
+                              style: subtitleStyle,
+                            ),
+                            trailing: IconButton(
+                              icon: Icon(Icons.directions),
+                              onPressed: () {},
+                            )),
+                        itemCount: 3)
                   ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            )
+          ],
         ),
-      ],
+      ),
     );
   }
 }

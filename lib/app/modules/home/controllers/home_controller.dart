@@ -1,7 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:lets_jamaah/app/modules/dzikirCounter/views/dzikir_counter_view.dart';
+import 'package:lets_jamaah/app/modules/home/views/home_view.dart';
+import 'package:lets_jamaah/app/modules/nearest_mosque/views/nearest_mosque_view.dart';
 
 class HomeController extends GetxController {
   RxBool progres = false.obs;
@@ -26,7 +30,6 @@ class HomeController extends GetxController {
     String formatTanggalSekarang = formatTanggal.format(tanggalSekarang);
 
     try {
-      // mensimulasikan request network
       http.Response response = await http.get(Uri.parse(
           'https://api.banghasan.com/sholat/format/json/jadwal/kota/775/tanggal/$formatTanggalSekarang'));
       Map data = jsonDecode(response.body);
@@ -55,6 +58,34 @@ class HomeController extends GetxController {
       progres.value = false;
       error.value = true;
     }
+
+
+
+class HomeController extends GetxController
+    with GetSingleTickerProviderStateMixin {
+  //TODO: Implement HomeController
+
+  final count = 0.obs;
+
+  final List<Widget> pages = [
+    HomeView(),
+    NearestMosqueView(),
+    DzikirCounterView()
+  ];
+
+  final RxInt tabIndex = 0.obs;
+  late TabController tabController;
+
+  void changeTab(int index) {
+    tabIndex.value = index;
+    tabController.animateTo(index);
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    tabController = TabController(length: pages.length, vsync: this);
+
   }
 
   String nowPray() {
@@ -186,6 +217,7 @@ class HomeController extends GetxController {
   }
 
   @override
+
   void onInit() {
     super.onInit();
     progres.value = false;
@@ -199,5 +231,10 @@ class HomeController extends GetxController {
     dataimsak = '00:00';
     dataterbit = '00:00';
     datatanggal = 'Hari, tanggal';
+
+  void onClose() {
+    tabController.dispose();
+    super.onClose();
+
   }
 }

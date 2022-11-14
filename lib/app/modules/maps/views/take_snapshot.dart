@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:lets_jamaah/app/modules/maps/views/maps_view.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 
-import 'package:lets_jamaah/main.dart';
 import 'page.dart';
 
 class TakeSnapPage extends ExamplePage {
