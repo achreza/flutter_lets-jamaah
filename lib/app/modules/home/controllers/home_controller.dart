@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:lets_jamaah/app/components/modals/map_sheet.dart';
+import 'package:lets_jamaah/app/constants/constant.dart';
+import 'package:lets_jamaah/app/data/mosque_model.dart';
 import 'package:lets_jamaah/app/modules/dzikirCounter/views/dzikir_counter_view.dart';
 import 'package:lets_jamaah/app/modules/home/views/home_view.dart';
 import 'package:lets_jamaah/app/modules/nearest_mosque/views/nearest_mosque_view.dart';
+import 'package:map_launcher/map_launcher.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
 
-class HomeController extends GetxController {
+class HomeController extends GetxController
+    with GetSingleTickerProviderStateMixin {
+  //TODO: Implement HomeController
+
   RxBool progres = false.obs;
   RxBool error = false.obs;
   late String datasubuh;
@@ -21,51 +30,11 @@ class HomeController extends GetxController {
   late String datatanggal;
   late int jam;
   late int menit;
+  Position? position;
 
-  void ambilData() async {
-    progres.value = true;
+  RxBool isLoading = true.obs;
 
-    var tanggalSekarang = DateTime.now();
-    var formatTanggal = DateFormat('yyyy-MM-dd');
-    String formatTanggalSekarang = formatTanggal.format(tanggalSekarang);
-
-    try {
-      http.Response response = await http.get(Uri.parse(
-          'https://api.banghasan.com/sholat/format/json/jadwal/kota/775/tanggal/$formatTanggalSekarang'));
-      Map data = jsonDecode(response.body);
-      String subuh = data['jadwal']['data']['subuh'];
-      String dzuhur = data['jadwal']['data']['dzuhur'];
-      String ashar = data['jadwal']['data']['ashar'];
-      String maghrib = data['jadwal']['data']['maghrib'];
-      String isya = data['jadwal']['data']['isya'];
-      String dhuha = data['jadwal']['data']['dhuha'];
-      String terbit = data['jadwal']['data']['terbit'];
-      String imsak = data['jadwal']['data']['imsak'];
-      String tanggal = data['jadwal']['data']['tanggal'];
-
-      datasubuh = subuh;
-      datadzuhur = dzuhur;
-      dataashar = ashar;
-      datamaghrib = maghrib;
-      dataisya = isya;
-      datadhuha = dhuha;
-      dataterbit = terbit;
-      dataimsak = imsak;
-      datatanggal = tanggal;
-      progres.value = false;
-      error.value = false;
-    } catch (e) {
-      progres.value = false;
-      error.value = true;
-    }
-
-
-
-class HomeController extends GetxController
-    with GetSingleTickerProviderStateMixin {
-  //TODO: Implement HomeController
-
-  final count = 0.obs;
+  List<MosqueModel> listMasjidUrut = listMasjid;
 
   final List<Widget> pages = [
     HomeView(),
@@ -85,7 +54,32 @@ class HomeController extends GetxController
   void onInit() {
     super.onInit();
     tabController = TabController(length: pages.length, vsync: this);
+    progres.value = false;
+    error.value = false;
+    datasubuh = '00:00';
+    datadzuhur = '00:00';
+    dataashar = '00:00';
+    datamaghrib = '00:00';
+    dataisya = '00:00';
+    datadhuha = '00:00';
+    dataimsak = '00:00';
+    dataterbit = '00:00';
+    datatanggal = 'Hari, tanggal';
+    ambilData();
+    loadLokasi();
+  }
 
+  //calculate distance
+  double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    return Geolocator.distanceBetween(lat1, lon1, lat2, lon2);
+  }
+
+  void sortMosque() {
+    listMasjidUrut.forEach((element) async {
+      element.distance = await calculateDistance(element.latitude,
+          element.longitude, position!.latitude, position!.longitude);
+      listMasjidUrut.sort((a, b) => a.distance.compareTo(b.distance));
+    });
   }
 
   String nowPray() {
@@ -216,25 +210,87 @@ class HomeController extends GetxController
     }
   }
 
-  @override
-
-  void onInit() {
-    super.onInit();
-    progres.value = false;
-    error.value = false;
-    datasubuh = '00:00';
-    datadzuhur = '00:00';
-    dataashar = '00:00';
-    datamaghrib = '00:00';
-    dataisya = '00:00';
-    datadhuha = '00:00';
-    dataimsak = '00:00';
-    dataterbit = '00:00';
-    datatanggal = 'Hari, tanggal';
-
   void onClose() {
     tabController.dispose();
     super.onClose();
+  }
 
+  void ambilData() async {
+    progres.value = true;
+
+    var tanggalSekarang = DateTime.now();
+    var formatTanggal = DateFormat('yyyy-MM-dd');
+    String formatTanggalSekarang = formatTanggal.format(tanggalSekarang);
+
+    try {
+      http.Response response = await http.get(Uri.parse(
+          'https://api.banghasan.com/sholat/format/json/jadwal/kota/775/tanggal/$formatTanggalSekarang'));
+      Map data = jsonDecode(response.body);
+      String subuh = data['jadwal']['data']['subuh'];
+      String dzuhur = data['jadwal']['data']['dzuhur'];
+      String ashar = data['jadwal']['data']['ashar'];
+      String maghrib = data['jadwal']['data']['maghrib'];
+      String isya = data['jadwal']['data']['isya'];
+      String dhuha = data['jadwal']['data']['dhuha'];
+      String terbit = data['jadwal']['data']['terbit'];
+      String imsak = data['jadwal']['data']['imsak'];
+      String tanggal = data['jadwal']['data']['tanggal'];
+
+      datasubuh = subuh;
+      datadzuhur = dzuhur;
+      dataashar = ashar;
+      datamaghrib = maghrib;
+      dataisya = isya;
+      datadhuha = dhuha;
+      dataterbit = terbit;
+      dataimsak = imsak;
+      datatanggal = tanggal;
+      progres.value = false;
+      error.value = false;
+    } catch (e) {
+      progres.value = false;
+      error.value = true;
+    }
+  }
+
+  void loadLokasi() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    sortMosque();
+    isLoading.value = false;
+  }
+
+  void openMaps(String title, double latitude, double longitude) {
+    MapsSheet.show(
+      onMapTap: (map) {
+        map.showDirections(
+          destination: Coords(latitude, longitude),
+          destinationTitle: title,
+          origin: Coords(position!.latitude, position!.longitude),
+          originTitle: "Posisi Saat ini",
+          directionsMode: DirectionsMode.walking,
+        );
+      },
+    );
   }
 }
