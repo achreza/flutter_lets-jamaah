@@ -34,7 +34,7 @@ class PlaceSymbolBody extends StatefulWidget {
 class PlaceSymbolBodyState extends State<PlaceSymbolBody> {
   PlaceSymbolBodyState();
 
-  static final LatLng center = const LatLng(-7.951346, 112.607515);
+  static final LatLng center = const LatLng(-7.9517844, 112.605264);
 
   MapboxMapController? controller;
   int _symbolCount = 0;
